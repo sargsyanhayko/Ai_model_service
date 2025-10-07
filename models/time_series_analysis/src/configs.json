@@ -1,0 +1,36 @@
+{
+  "paths": {
+    "path_to_generated": "../generated",
+    "path_to_provided": "../../../provided",
+    "save_path": ""
+  },
+  "adg_code": "2710",
+  "end_date": "2023-12-30",
+  "start_date": "2023-01-01",
+  "time_col": "RECEIPT_TIME_HOUR",
+  "product_id_col": "PRODUCT_GROUP",
+  "target_col": "QANTITY_sum",
+  "plot_temporal": true,
+  "plot_entity": true,
+  "TINs": {
+    "01282006": {}
+  },
+  "anomaly_factor": 1.5,
+  "entity_outlier_threshold": 10.0,
+  "user": "ematevosyan",
+  "time_range": [
+    "2023-12-01",
+    "2024-03-01"
+  ],
+  "sub_category": null,
+  "category_score": 0.5,
+  "brand_name": null,
+  "sub_category_ARM_1": null,
+  "aggregation_level": null,
+  "year": 2024,
+  "adg": [
+    2402.0,
+    2710.0
+  ],
+  "path_to_plots": "plots"
+}

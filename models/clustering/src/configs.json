@@ -1,0 +1,48 @@
+{
+    "paths": {
+        "path_to_generated": "../generated",
+        "plots_folder": "plots"
+    },
+    "columns_level1": {
+        "sector_columns": true,
+        "employee_columns": true,
+        "product_columns": true,
+        "additional_columns": true,
+        "invoice_columns": true,
+        "location_columns": true,
+        "count_columns": true,
+        "revenue_columns": true,
+        "time_flags": true
+    },
+    "columns_level2": [
+        "buyer_COUNT_mean",
+        "AVG_N_EMPLOYEES",
+        "buyer_COUNT_std",
+        "v18b",
+        "v17a",
+        "v17a_mean",
+        "v7a",
+        "v7a_mean",
+        "Years_in_business"
+    ],
+    "ADG_code": [
+        "2402.0",
+        "2710.0"
+    ],
+    "random_seed": 42,
+    "target_column": null,
+    "histogram_column": "productivity",
+    "cluster_range": [
+        3,
+        10
+    ],
+    "n_clusters": null,
+    "max_depth": 4,
+    "minbucket": 0.01,
+    "plot": true,
+    "save_json": true,
+    "TINs": null,
+    "sector": null,
+    "year": "2024",
+    "user": "ematevosyan"
+}
