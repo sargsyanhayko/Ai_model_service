@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from fastapi import FastAPI
 from pydantic import BaseModel, field_validator
+from fastapi import HTTPException, Query
 
 app = FastAPI()
 
@@ -226,6 +227,89 @@ def run_command(request: CommandRequest):
     except Exception as e:
         return {"error": f"❌ {type(e).__name__}: {e}"}
     
+
+
+@app.get("/models")
+def list_models(detailed: bool = Query(False, description="Include runtime checks")):
+    out = []
+    for name, cfg in ALLOWED_MODELS.items():
+        item = {
+            "name": name,
+            "runner": cfg["runner"],
+            "entry": cfg["entry"],
+            "workdirs": cfg["workdirs"],
+            "prefix_args": cfg.get("prefix_args", []),
+            "allowed_args": sorted(cfg["allowed_args"].keys()),
+        }
+        if detailed:
+            model_dir = (MODELS_ROOT / name).resolve()
+            # check workdir/entry like in _build_command
+            entry_found = False
+            chosen_workdir = None
+            if cfg["runner"] == "script":
+                for wd in cfg["workdirs"]:
+                    cand = model_dir / wd
+                    if (cand / cfg["entry"]).exists():
+                        entry_found = True
+                        chosen_workdir = cand
+                        break
+            else:
+                for wd in cfg["workdirs"]:
+                    cand = model_dir / wd
+                    if cand.exists():
+                        entry_found = True
+                        chosen_workdir = cand
+                        break
+            py_cmd = _find_python(model_dir, cfg["venv_candidates"], cfg["prefer_py"])
+            item.update({
+                "model_dir": str(model_dir),
+                "workdir": str(chosen_workdir) if chosen_workdir else None,
+                "entry_found": entry_found,
+                "python_cmd": py_cmd,
+            })
+        out.append(item)
+    return {"models": out}
+
+@app.get("/models/{name}")
+def get_model(name: str, detailed: bool = Query(True, description="Include runtime checks")):
+    if name not in ALLOWED_MODELS:
+        raise HTTPException(status_code=404, detail=f"Unknown model '{name}'")
+    cfg = ALLOWED_MODELS[name]
+    item = {
+        "name": name,
+        "runner": cfg["runner"],
+        "entry": cfg["entry"],
+        "workdirs": cfg["workdirs"],
+        "prefix_args": cfg.get("prefix_args", []),
+        "allowed_args": sorted(cfg["allowed_args"].keys()),
+    }
+    if detailed:
+        model_dir = (MODELS_ROOT / name).resolve()
+        entry_found = False
+        chosen_workdir = None
+        if cfg["runner"] == "script":
+            for wd in cfg["workdirs"]:
+                cand = model_dir / wd
+                if (cand / cfg["entry"]).exists():
+                    entry_found = True
+                    chosen_workdir = cand
+                    break
+        else:
+            for wd in cfg["workdirs"]:
+                cand = model_dir / wd
+                if cand.exists():
+                    entry_found = True
+                    chosen_workdir = cand
+                    break
+        py_cmd = _find_python(model_dir, cfg["venv_candidates"], cfg["prefer_py"])
+        item.update({
+            "model_dir": str(model_dir),
+            "workdir": str(chosen_workdir) if chosen_workdir else None,
+            "entry_found": entry_found,
+            "python_cmd": py_cmd,
+        })
+    return item
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8888, reload=True)
